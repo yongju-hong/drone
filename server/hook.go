@@ -94,9 +94,10 @@ func PostHook(c *gin.Context) {
 		return
 	}
 
-	repo, err := store.GetRepoOwnerName(c, tmprepo.Owner, tmprepo.Name)
+	owner := strings.Replace(tmprepo.Owner, "--", "/", -1)
+	repo, err := store.GetRepoOwnerName(c, owner, tmprepo.Name)
 	if err != nil {
-		logrus.Errorf("failure to find repo %s/%s from hook. %s", tmprepo.Owner, tmprepo.Name, err)
+		logrus.Errorf("failure to find repo %s/%s from hook. %s", owner, tmprepo.Name, err)
 		c.AbortWithError(404, err)
 		return
 	}

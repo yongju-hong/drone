@@ -30,6 +30,7 @@ import (
 	"github.com/drone/drone/shared/oauth2"
 
 	"github.com/drone/drone/remote/gitlab/client"
+	"github.com/Sirupsen/logrus"
 )
 
 const DefaultScope = "api"
@@ -270,8 +271,12 @@ func (g *Gitlab) Repos(u *model.User) ([]*model.Repo, error) {
 	for _, repo_ := range all {
 		var parts = strings.Split(repo_.PathWithNamespace, "/")
 		var owner = parts[0]
-		var name = parts[1]
+		//var name = parts[1]
 
+		var name = parts[len(parts)-1]
+		if len(parts) > 1 {
+			owner = strings.Join(parts[:len(parts)-1], "--")
+		}
 		repo := &model.Repo{}
 		repo.Owner = owner
 		repo.Name = name
@@ -411,11 +416,13 @@ func (g *Gitlab) Netrc(u *model.User, r *model.Repo) (*model.Netrc, error) {
 func (g *Gitlab) Activate(user *model.User, repo *model.Repo, link string) error {
 	var client = NewClient(g.URL, user.Token, g.SkipVerify)
 	id, err := GetProjectId(g, client, repo.Owner, repo.Name)
+	logrus.Debugf(">>>>> id: %s, err: %s", id, err)
 	if err != nil {
 		return err
 	}
 
 	uri, err := url.Parse(link)
+	logrus.Debugf(">>>>> uri: %s, err: %s", uri, err)
 	if err != nil {
 		return err
 	}
@@ -492,7 +499,7 @@ func mergeRequest(parsed *client.HookPayload, req *http.Request) (*model.Repo, *
 	} else {
 		repo.Owner = req.FormValue("owner")
 		repo.Name = req.FormValue("name")
-		repo.FullName = fmt.Sprintf("%s/%s", repo.Owner, repo.Name)
+		repo.FullName = fmt.Sprintf("%s/%s", strings.Replace(repo.Owner, "--", "/", -1), repo.Name)
 	}
 
 	repo.Link = target.WebUrl

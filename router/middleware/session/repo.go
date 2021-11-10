@@ -17,6 +17,7 @@ package session
 import (
 	"net/http"
 	"time"
+	"strings"
 
 	"github.com/drone/drone/model"
 	"github.com/drone/drone/remote"
@@ -53,7 +54,8 @@ func Repos(c *gin.Context) []*model.RepoLite {
 func SetRepo() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			owner = c.Param("owner")
+			param_owner = c.Param("owner")
+			owner = strings.Replace(param_owner, "--", "/", -1)
 			name  = c.Param("name")
 			user  = User(c)
 		)

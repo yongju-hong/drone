@@ -117,7 +117,7 @@ func ExtractFromPath(str string) (string, string, error) {
 	if len(s) < 2 {
 		return "", "", fmt.Errorf("Minimum match not found")
 	}
-	return s[0], s[1], nil
+	return strings.Join(s[:len(s)-1], "--"), s[len(s)-1], nil
 }
 
 func GetUserEmail(c *client.Client, defaultURL string) (*client.Client, error) {
@@ -131,9 +131,11 @@ func GetProjectId(r *Gitlab, c *client.Client, owner, name string) (projectId st
 			return "", err
 		}
 		projectId := strconv.Itoa(_projectId)
+		projectId = strings.Replace(projectId, "--", "%2F", -1)
 		return projectId, nil
 	} else {
 		projectId := ns(owner, name)
+		projectId = strings.Replace(projectId, "--", "%2F", -1)
 		return projectId, nil
 	}
 }
