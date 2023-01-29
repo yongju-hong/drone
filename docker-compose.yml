@@ -1,0 +1,35 @@
+version: "3"
+services:
+  drone:
+    container_name: drone
+    image: dreg.be/devops/drone/drone:0.8.10
+    volumes:
+        - /var/lib/drone:/var/lib/drone
+    #command: /etc/enswer/mi/wss/wss.conf
+    network_mode: host
+    restart: unless-stopped
+    ports:
+        - 80:80
+        - 9000:9000
+    environment:
+        - DRONE_SERVER_ADDR=:80
+        - DRONE_OPEN=true
+        - DRONE_ADMIN=yhong
+        - DRONE_GITLAB=true
+        - DRONE_GITLAB_CLIENT=15d48fba4fb1f8b5ce8c073988291dfe7ef3d44ec1fc01ae0719d91454bfc917
+        - DRONE_GITLAB_SECRET=1144b17a610b0d9ba4f792e7fe44a002dc5ec236def1186b01f5d2dc7df45882
+        - DRONE_GITLAB_PRIVATE_MODE=true
+        - DRONE_AGENT_SECRET=drone-1
+        - DOCKER_MAX_PROCS=1
+        - DRONE_GITLAB_URL=https://gitlab.eng.roku.com
+        - DRONE_HOST=http://10.224.33.150
+        - DRONE_LOGS_DEBUG=true
+        - DRONE_DEBUG=true
+        - DRONE_TRACE=true
+        - DRONE_RPC_DUMP_HTTP=true
+        - DRONE_RPC_DUMP_HTTP_BODY=true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
